@@ -11,7 +11,7 @@ Once you have git and VirtualBox installed, to get up and running:
 
 `git clone https://github.com/bryanapperson/swiss_tournament/tree/master`
 
-'cd swiss_tournament'
+`cd swiss_tournament`
 
 * For single tournament support:
 
@@ -21,7 +21,7 @@ Once you have git and VirtualBox installed, to get up and running:
 
 `git checkout multi-tournament`
 
-* For the latest version use master branch.
+For the latest version use the `master` branch.
 
 ### Starting the Vagrant instance
 
@@ -29,6 +29,6 @@ To start the Vagrant instance:
 
 `vagrant up`
 
-Then, to connect:
+Then, to connect to the instance:
 
 `vagrant ssh`
