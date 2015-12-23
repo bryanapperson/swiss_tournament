@@ -12,8 +12,15 @@ CREATE TABLE players (
     id serial primary key,
     name text
 );
+CREATE TABLE tournaments (
+    id serial primary key,
+    winner int references players(id)
+);
+ALTER TABLE players
+ADD present_tournament int references tournaments(id);
 CREATE TABLE matches (
     id serial primary key,
+    tournament int references tournaments(id),
     winner int references players(id),
     loser int references players(id)
 );
