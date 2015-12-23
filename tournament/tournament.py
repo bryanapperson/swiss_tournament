@@ -11,10 +11,14 @@ of wins, or as close as possible.
 import bleach
 import ConfigParser
 import logging
+import os.path
 import psycopg2
 
 
 # Logging utility
+
+# Global defaults for logging
+
 
 def create_logger():
     '''Creates logger object for module.
@@ -46,7 +50,7 @@ def create_info(infostr, boolp=False):
     LOGGER.info(str(infostr))
 
 
-def create_warning(warnstr, boolp=True):
+def create_warning(warnstr, boolp=False):
     '''Creates warning level log messages
 
     Creates warning message <warnstr> in the log if log level is set to warn,
@@ -68,7 +72,7 @@ def create_exception(errstr):
     raise Exception(str(errstr))
 
 
-def configure_logger(loglevel='WARNING'):
+def configure_logger(loglevel='CRITICAL'):
     '''Configures log level
 
     Returns a numeric log level assuming loglevel is bound to the string value
@@ -90,6 +94,7 @@ def configure_logger(loglevel='WARNING'):
 
 # Config utility
 
+
 def read_config(configfile):
     '''Parses the config file
 
@@ -105,7 +110,8 @@ def read_config(configfile):
     return config
 
 
-def config_section_map(configuration, section='default'):
+def config_section_map(configuration=read_config('tournament.conf'),
+                       section='default'):
     '''Maps sections of configuration file
 
     Returns a section of the configuration object as a dictionary
@@ -132,12 +138,46 @@ def config_section_map(configuration, section='default'):
 
 # End config utility
 
+# Global default config
+# Read config file or set global defaults if it cannot be read
+
+CONFIGFILE = 'tournament.conf'
+if os.path.isfile(CONFIGFILE):
+    CONFIGURATION = read_config(CONFIGFILE)
+    DEFCONSEC = config_section_map(CONFIGURATION)
+    LOGLEVEL = DEFCONSEC['loglevel']
+    LOGLOCATION = DEFCONSEC['loglocation']
+    DBNAME = DEFCONSEC['dbname']
+else:
+    LOGLEVEL = 'CRITICAL'
+    LOGLOCATION = 'tournament.log'
+    DBNAME = 'tournament'
+
+# End global default config
+
+# Global defaults for logging
+
+logging.basicConfig(filename=LOGLOCATION,
+                    format='%(asctime)s: %(name)s:'
+                    '%(levelname)s: %(message)s',
+                    level=configure_logger(LOGLEVEL))
+
+# End global defaults for logging
+
 # Global functions
 
 
-def connect():
-    '''Connect to the PostgreSQL database.  Returns a database connection.'''
-    return psycopg2.connect('dbname=tournament')
+def connect(dbname=None):
+    '''Connect to the PostgreSQL database.  Returns a database connection.
+
+    Args:
+        dbname:
+        type: string
+        description: name of database to connect to
+    '''
+    if dbname is None:
+        dbname = DBNAME
+    return psycopg2.connect('dbname=' + dbname)
 
 
 def deletePlayers():
@@ -183,7 +223,7 @@ def deleteTournaments():
 
 
 def countPlayers():
-    '''Returns the number of players currently registered golbally.'''
+    '''Returns the number of players currently registered globally.'''
     # Connect to DB
     db = connect()
     # Get cursor
@@ -241,8 +281,6 @@ def playerStandings():
     db = connect()
     # Get cursor
     cursor = db.cursor()
-    # SELECT a.id, count(a.id) as matches FROM players a LEFT JOIN matches w
-    # ON a.id = w.winner OR a.id = w.loser GROUP BY a.id;
     # We need a count of rows or to return 0 on none
     player_count = '''
                    SELECT * FROM statistics
@@ -354,7 +392,7 @@ class swissTournament(object):
         # Return number of players
         return stats
 
-    def reportMatch(winner, loser, draw=None):
+    def reportMatch(self, winner, loser, draw=None):
         '''Records the outcome of a single match between two players.
 
         Args:
@@ -377,8 +415,8 @@ class swissTournament(object):
         # Close connection
         db.close()
 
-    def swissPairings():
-        '''Returns a list of pairs of players for the next round of a match.
+    def swissPairings(self):
+        '''Returns a list of pairs of players for the next round of matches.
 
         Assuming that there are an even number of players registered, each
         player appears exactly once in the pairings.  Each player is paired
