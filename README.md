@@ -14,7 +14,7 @@ Once you have git and VirtualBox installed, to get up and running:
 
 `cd swiss_tournament`
 
-* For single tournament support:
+* For single tournament support only (Udacity project):
 
 `git checkout single_tournament`
 
@@ -49,3 +49,7 @@ To execute the unit tests:
 `python tournament_test.py`
 
 * The test script will exit without error if all unit tests are passed.
+
+## Function documentation
+
+For documentation on tournament.py, use pydoc. It will format the docstrings for easy to view output.
