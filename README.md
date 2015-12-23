@@ -20,7 +20,7 @@ Once you have git and VirtualBox installed, to get up and running:
 
 * For multi-tournament (extra credit in the Udacity project):
 
-`git checkout multi-tournament`
+`git checkout master`
 
 For the latest version use the `master` branch.
 
