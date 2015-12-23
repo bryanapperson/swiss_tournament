@@ -14,7 +14,7 @@ Once you have git and VirtualBox installed, to get up and running:
 
 `cd swiss_tournament`
 
-* For single tournament support:
+* For single tournament support only (Udacity project):
 
 `git checkout single_tournament`
 
