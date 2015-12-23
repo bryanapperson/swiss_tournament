@@ -3,7 +3,8 @@ Python Backend for Swiss Tournament - Originally for Udacity Intro to Relational
 
 ## Vagrant
 
-This project come with a Vagrant development environment. You will need to have git and VirtualBox installed.
+This project come with a Vagrant development environment. You will need to
+have git and VirtualBox installed.
 
 ### Getting the source for Vagrant
 
@@ -32,3 +33,19 @@ To start the Vagrant instance:
 Then, to connect to the instance:
 
 `vagrant ssh`
+
+### Running the Unit Tests
+
+To run the unit tests from within the vagrant VM:
+
+`cd /vagrant/tournament`
+
+First the database must be created. To do this:
+
+`psql -f tournament.sql`
+
+To execute the unit tests:
+
+`python tournament_test.py`
+
+* The test script will exit without error if all unit tests are passed.

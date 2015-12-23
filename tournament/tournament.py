@@ -13,12 +13,12 @@ import psycopg2
 
 
 def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
+    '''Connect to the PostgreSQL database.  Returns a database connection.'''
     return psycopg2.connect('dbname=tournament')
 
 
 def deleteMatches():
-    """Remove all the match records from the database."""
+    '''Remove all the match records from the database.'''
     # Connect to DB
     db = connect()
     # Get cursor
@@ -32,7 +32,7 @@ def deleteMatches():
 
 
 def deletePlayers():
-    """Remove all the player records from the database."""
+    '''Remove all the player records from the database.'''
     # Connect to DB
     db = connect()
     # Get cursor
@@ -45,8 +45,8 @@ def deletePlayers():
     db.close()
 
 
-def countPlayers(tournament=None):
-    """Returns the number of players currently registered."""
+def countPlayers():
+    '''Returns the number of players currently registered.'''
     # Connect to DB
     db = connect()
     # Get cursor
@@ -65,15 +65,15 @@ def countPlayers(tournament=None):
     return playernum
 
 
-def registerPlayer(name, tournament=None):
-    """Adds a player to the tournament database.
+def registerPlayer(name):
+    '''Adds a player to the tournament database.
 
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
 
     Args:
       name: the player's full name (need not be unique).
-    """
+    '''
     # Sanitize SQL injection vulnerability
     name = bleach.clean(name)
     # Connect to DB
@@ -87,8 +87,8 @@ def registerPlayer(name, tournament=None):
     db.close()
 
 
-def playerStandings(tournament=None):
-    """Returns a list of the players and their win records, sorted by wins.
+def playerStandings():
+    '''Returns a list of the players and their win records, sorted by wins.
 
     The first entry in the list should be the player in first place, or a
     player tied for first place if there is currently a tie.
@@ -99,7 +99,7 @@ def playerStandings(tournament=None):
         name: the player's full name (as registered)
         wins: the number of matches the player has won
         matches: the number of matches the player has played
-    """
+    '''
     # Connect to DB
     db = connect()
     # Get cursor
@@ -120,13 +120,13 @@ def playerStandings(tournament=None):
     return stats
 
 
-def reportMatch(winner, loser, tournament=None):
-    """Records the outcome of a single match between two players.
+def reportMatch(winner, loser):
+    '''Records the outcome of a single match between two players.
 
     Args:
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
-    """
+    '''
     # Sanitize SQL injection vulnerability
     winner = bleach.clean(winner)
     loser = bleach.clean(loser)
@@ -142,8 +142,8 @@ def reportMatch(winner, loser, tournament=None):
     db.close()
 
 
-def swissPairings(tournament=None):
-    """Returns a list of pairs of players for the next round of a match.
+def swissPairings():
+    '''Returns a list of pairs of players for the next round of a match.
 
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
@@ -156,4 +156,19 @@ def swissPairings(tournament=None):
         name1: the first player's name
         id2: the second player's unique id
         name2: the second player's name
-    """
+    '''
+    player_ranks = playerStandings()
+    pairings = []
+    pair = []
+    for player in range(0, len(player_ranks)):
+        player_info = player_ranks[player]
+        if len(pair) == 0:
+            pair.append(player_info[0])
+            pair.append(player_info[1])
+        else:
+            pair.append(player_info[0])
+            pair.append(player_info[1])
+            pair_info = (pair[0], pair[1], pair[2], pair[3])
+            pairings.append(pair_info)
+            pair = []
+    return pairings
